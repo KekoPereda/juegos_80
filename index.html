@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juegos Retro 80</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=VT323&display=swap">
+    <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+
+<body>
+    <main class="escena">
+        <div class="pantalla">
+            <img class="logo" src="assets/img/logo_ms_dos.png" alt="SM">
+            <pre
+                class="terminal"><span class="salida"></span><span class="linea"></span><span class="cursor">_</span></pre>
+            <div class="reloj" aria-live="off">TIEMPO <span class="reloj-valor">10:00</span></div>
+            <div class="login-dos capa-dos">
+                <form class="caja-dos" onsubmit="return false">
+                    <p class="caja-titulo">SM-NET · Inicio de sesión</p>
+                    <p>Ingresa tu correo y pulsa ENTER para jugar.<br>Tus puntajes se guardarán en el ranking.</p>
+                    <label class="login-campo">Correo:
+                        <input class="login-correo" type="email" autocomplete="email" autocapitalize="off"
+                            spellcheck="false" maxlength="80">
+                    </label>
+                    <p class="login-mensaje" aria-live="polite"></p>
+                    <p class="login-ayuda">ENTER aceptar · ESC cancelar</p>
+                </form>
+            </div>
+            <div class="despedida-dos capa-dos">
+                <div class="despedida">
+                    <p class="despedida-1"></p>
+                    <p class="despedida-2"></p>
+                </div>
+            </div>
+            <div class="basic-dos">
+                <div class="basic-texto"></div>
+                <p class="basic-ayuda"></p>
+            </div>
+            <div class="carga-dos capa-dos">
+                <div class="carga">
+                    <p class="carga-estado"></p>
+                    <p class="carga-titulo">MEJORES PUNTAJES</p>
+                    <p class="carga-juego"></p>
+                    <ol class="carga-tabla"></ol>
+                    <p class="carga-jugador"></p>
+                </div>
+            </div>
+            <div class="error-dos capa-dos" role="alert">
+                <div class="error-caja caja-dos">
+                    <p class="caja-titulo">Error crítico del sistema 0x0A</p>
+                    <p><strong>TIEMPO DE JUEGO DIARIO AGOTADO</strong></p>
+                    <p>Se han consumido los <span class="error-minutos">10</span> minutos de juego permitidos para
+                        hoy.<br>Vuelve mañana para seguir jugando.</p>
+                    <p>Anular, Reintentar, Descartar? <span class="error-respuesta"></span><span class="cursor">_</span>
+                    </p>
+                    <p class="error-fin"></p>
+                </div>
+            </div>
+        </div>
+        <button class="computador" type="button" aria-label="Encender el computador"></button>
+        <div class="et-luna" aria-hidden="true"></div>
+        <img class="et-figura" src="assets/img/et-figura.png" alt="">
+        <button class="poster-et" type="button" aria-label="Póster de E.T."></button>
+        <button class="lampara" type="button" aria-label="Encender o apagar la lámpara"></button>
+        <button class="radio" type="button" aria-label="Reproducir o pausar la música de la radio"
+            aria-pressed="false"></button>
+        <audio class="cancion" src="assets/audio/cancion.mp3" preload="none" loop></audio>
+    </main>
+    <div class="telon" aria-hidden="true"></div>
+
+    <script src="assets/js/juegos/invasion.js"></script>
+    <script src="assets/js/juegos/bloques.js"></script>
+    <script src="assets/js/juegos/raton.js"></script>
+    <script src="assets/js/juegos.js"></script>
+    <script src="assets/js/sonido-pc.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script src="assets/js/resultados.js"></script>
+    <script src="assets/js/poster-et.js"></script>
+</body>
+
+</html>

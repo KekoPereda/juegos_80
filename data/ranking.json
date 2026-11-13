@@ -1,0 +1,240 @@
+{
+    "INVASION": {
+        "erik.pereda@grupo-sm.com": {
+            "puntos": 1790,
+            "fecha": "2026-11-13 01:21:58"
+        },
+        "alejandra.cantillano@grupo-sm.com": {
+            "puntos": 1156,
+            "fecha": "2026-11-12 23:51:00"
+        },
+        "astrid.muñoz@grupo-sm.com": {
+            "puntos": 4311,
+            "fecha": "2026-11-13 01:36:00"
+        },
+        "vicente.duque@grupo-sm.com": {
+            "puntos": 3640,
+            "fecha": "2026-11-12 15:22:00"
+        },
+        "ana.soto@simulado.local": {
+            "puntos": 4047,
+            "fecha": "2026-11-12 22:38:00"
+        },
+        "luis.rojas@simulado.local": {
+            "puntos": 3503,
+            "fecha": "2026-11-10 10:36:00"
+        },
+        "pedro.vera@simulado.local": {
+            "puntos": 2897,
+            "fecha": "2026-11-11 15:27:00"
+        },
+        "tomas.paz@simulado.local": {
+            "puntos": 4500,
+            "fecha": "2026-11-10 18:01:00"
+        },
+        "clara.ruiz@simulado.local": {
+            "puntos": 3823,
+            "fecha": "2026-11-11 22:09:00"
+        },
+        "diego.mora@simulado.local": {
+            "puntos": 4126,
+            "fecha": "2026-11-10 14:54:00"
+        },
+        "elena.cruz@simulado.local": {
+            "puntos": 4105,
+            "fecha": "2026-11-11 06:29:00"
+        },
+        "felipe.olea@simulado.local": {
+            "puntos": 2882,
+            "fecha": "2026-11-11 16:11:00"
+        },
+        "camila.nunez@simulado.local": {
+            "puntos": 5399,
+            "fecha": "2026-11-11 02:14:00"
+        },
+        "javier.toro@simulado.local": {
+            "puntos": 4185,
+            "fecha": "2026-11-13 06:15:00"
+        },
+        "paula.reyes@simulado.local": {
+            "puntos": 5122,
+            "fecha": "2026-11-11 17:57:00"
+        },
+        "matias.silva@simulado.local": {
+            "puntos": 4036,
+            "fecha": "2026-11-12 00:08:00"
+        },
+        "valentina.ross@simulado.local": {
+            "puntos": 5748,
+            "fecha": "2026-11-11 03:42:00"
+        },
+        "ignacio.fuentes@simulado.local": {
+            "puntos": 4655,
+            "fecha": "2026-11-12 06:02:00"
+        },
+        "catalina.vidal@simulado.local": {
+            "puntos": 1535,
+            "fecha": "2026-11-11 05:47:00"
+        },
+        "benjamin.araya@simulado.local": {
+            "puntos": 1382,
+            "fecha": "2026-11-10 20:39:00"
+        },
+        "fernanda.leiva@simulado.local": {
+            "puntos": 3073,
+            "fecha": "2026-11-10 18:57:00"
+        }
+    },
+    "BLOQUES": {
+        "erik.pereda@grupo-sm.com": {
+            "puntos": 4358,
+            "fecha": "2026-11-13 01:25:18"
+        },
+        "marcela.indo@grupo-sm.com": {
+            "puntos": 2770,
+            "fecha": "2026-11-10 18:30:00"
+        },
+        "astrid.muñoz@grupo-sm.com": {
+            "puntos": 2707,
+            "fecha": "2026-11-11 03:53:00"
+        },
+        "vicente.duque@grupo-sm.com": {
+            "puntos": 3115,
+            "fecha": "2026-11-12 10:58:00"
+        },
+        "ana.soto@simulado.local": {
+            "puntos": 3320,
+            "fecha": "2026-11-11 09:31:00"
+        },
+        "luis.rojas@simulado.local": {
+            "puntos": 1340,
+            "fecha": "2026-11-12 06:09:00"
+        },
+        "pedro.vera@simulado.local": {
+            "puntos": 1736,
+            "fecha": "2026-11-13 08:41:00"
+        },
+        "sofia.lara@simulado.local": {
+            "puntos": 1704,
+            "fecha": "2026-11-12 10:41:00"
+        },
+        "tomas.paz@simulado.local": {
+            "puntos": 1736,
+            "fecha": "2026-11-10 12:56:00"
+        },
+        "clara.ruiz@simulado.local": {
+            "puntos": 1530,
+            "fecha": "2026-11-11 23:49:00"
+        },
+        "elena.cruz@simulado.local": {
+            "puntos": 2583,
+            "fecha": "2026-11-10 23:41:00"
+        },
+        "felipe.olea@simulado.local": {
+            "puntos": 1698,
+            "fecha": "2026-11-11 02:27:00"
+        },
+        "camila.nunez@simulado.local": {
+            "puntos": 3472,
+            "fecha": "2026-11-13 04:10:00"
+        },
+        "javier.toro@simulado.local": {
+            "puntos": 4181,
+            "fecha": "2026-11-13 04:27:00"
+        },
+        "matias.silva@simulado.local": {
+            "puntos": 2390,
+            "fecha": "2026-11-11 04:16:00"
+        },
+        "valentina.ross@simulado.local": {
+            "puntos": 3382,
+            "fecha": "2026-11-11 02:10:00"
+        },
+        "ignacio.fuentes@simulado.local": {
+            "puntos": 2577,
+            "fecha": "2026-11-12 03:00:00"
+        },
+        "catalina.vidal@simulado.local": {
+            "puntos": 579,
+            "fecha": "2026-11-12 18:56:00"
+        },
+        "benjamin.araya@simulado.local": {
+            "puntos": 789,
+            "fecha": "2026-11-12 02:56:00"
+        },
+        "fernanda.leiva@simulado.local": {
+            "puntos": 1900,
+            "fecha": "2026-11-10 14:38:00"
+        }
+    },
+    "RATON": {
+        "marcela.indo@grupo-sm.com": {
+            "puntos": 4704,
+            "fecha": "2026-11-12 12:40:00"
+        },
+        "alejandra.cantillano@grupo-sm.com": {
+            "puntos": 1105,
+            "fecha": "2026-11-10 17:29:00"
+        },
+        "astrid.muñoz@grupo-sm.com": {
+            "puntos": 4006,
+            "fecha": "2026-11-12 19:22:00"
+        },
+        "vicente.duque@grupo-sm.com": {
+            "puntos": 3646,
+            "fecha": "2026-11-12 20:26:00"
+        },
+        "luis.rojas@simulado.local": {
+            "puntos": 2350,
+            "fecha": "2026-11-13 07:04:00"
+        },
+        "pedro.vera@simulado.local": {
+            "puntos": 2570,
+            "fecha": "2026-11-12 02:08:00"
+        },
+        "sofia.lara@simulado.local": {
+            "puntos": 3169,
+            "fecha": "2026-11-12 02:57:00"
+        },
+        "tomas.paz@simulado.local": {
+            "puntos": 3616,
+            "fecha": "2026-11-12 17:36:00"
+        },
+        "clara.ruiz@simulado.local": {
+            "puntos": 2109,
+            "fecha": "2026-11-12 11:28:00"
+        },
+        "elena.cruz@simulado.local": {
+            "puntos": 4761,
+            "fecha": "2026-11-10 14:02:00"
+        },
+        "felipe.olea@simulado.local": {
+            "puntos": 1692,
+            "fecha": "2026-11-11 01:45:00"
+        },
+        "camila.nunez@simulado.local": {
+            "puntos": 3463,
+            "fecha": "2026-11-11 18:54:00"
+        },
+        "paula.reyes@simulado.local": {
+            "puntos": 5284,
+            "fecha": "2026-11-11 08:20:00"
+        },
+        "matias.silva@simulado.local": {
+            "puntos": 2539,
+            "fecha": "2026-11-12 22:42:00"
+        },
+        "valentina.ross@simulado.local": {
+            "puntos": 6118,
+            "fecha": "2026-11-12 15:18:00"
+        },
+        "benjamin.araya@simulado.local": {
+            "puntos": 1259,
+            "fecha": "2026-11-11 18:12:00"
+        },
+        "fernanda.leiva@simulado.local": {
+            "puntos": 2800,
+            "fecha": "2026-11-13 02:28:00"
+        }
+    }
+}

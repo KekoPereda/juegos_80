@@ -1,0 +1,759 @@
+:root {
+    /* Fuente de mapa de bits estilo terminal; Courier si no hay conexión */
+    --fuente-dos: "VT323", "Courier New", Courier, monospace;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+body {
+    background: #000;
+    overflow: hidden;
+}
+
+/* Escena con la proporción de la imagen (1672x941) que cubre toda la ventana,
+   igual que background-size: cover, para que las zonas coincidan con el dibujo */
+.escena {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: max(100vw, calc(100vh * 1672 / 941));
+    height: max(100vh, calc(100vw * 941 / 1672));
+    transform: translate(-50%, -50%);
+    background: url("../img/fondo0.png") center / 100% 100% no-repeat;
+}
+
+/* Zona clicable del computador (monitor + CPU) en porcentajes de la imagen */
+.computador {
+    position: absolute;
+    z-index: 2;
+    left: 30.8%;
+    top: 23.9%;
+    width: 35.3%;
+    height: 53.7%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.computador:focus-visible {
+    outline: 3px dashed #0f0;
+}
+
+.escena.encendido .computador {
+    cursor: default;
+}
+
+/* ---------- Pantalla CRT ---------- */
+
+/* Área del cristal del monitor en porcentajes de la imagen */
+.pantalla {
+    position: absolute;
+    z-index: 1;
+    left: 40.7%;
+    top: 28.9%;
+    width: 19.7%;
+    height: 25.8%;
+    border-radius: 7% / 10%;
+    overflow: hidden;
+    pointer-events: none;
+    container-type: inline-size;
+    display: grid;
+    place-items: center;
+    opacity: 0;
+}
+
+/* Brillo verde de fósforo; "screen" respeta la textura de la imagen de debajo */
+.pantalla::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, #22c55e 0%, #15803d 60%, #0b3d1e 100%);
+    mix-blend-mode: screen;
+}
+
+/* Líneas de barrido y viñeta en los bordes */
+.pantalla::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.18) 0 1px, transparent 1px 3px),
+        radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.45) 100%);
+    animation: parpadeo 0.12s steps(2) infinite;
+}
+
+/* Encendido: aparece una línea horizontal que se abre hacia arriba y abajo */
+.escena.encendido .pantalla {
+    opacity: 1;
+    animation: encender 0.6s ease-out;
+}
+
+@keyframes encender {
+    0%   { transform: scale(0.02, 0.005); filter: brightness(4); }
+    40%  { transform: scale(1, 0.01);     filter: brightness(3); }
+    100% { transform: scale(1, 1);        filter: brightness(1); }
+}
+
+@keyframes parpadeo {
+    from { opacity: 0.9; }
+    to   { opacity: 1; }
+}
+
+/* ---------- Logo SM (assets/img/logo_ms_dos.png) ---------- */
+
+.logo {
+    position: relative;
+    z-index: 1;
+    display: block;
+    width: 42cqw;
+    height: auto;
+    box-shadow: 0 0 4cqw rgba(80, 255, 80, 0.6);
+    image-rendering: pixelated; /* la imagen es pequeña: se amplía con píxeles, estilo retro */
+    opacity: 0;
+    transition: opacity 2.5s ease-in;
+}
+
+.escena.con-logo .logo {
+    opacity: 1;
+}
+
+/* ---------- SM-DOS ---------- */
+
+/* La escena se mueve con transición cuando hacemos zoom al monitor */
+.escena {
+    transition: transform 2s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* Pantalla negra para el arranque de SM-DOS */
+.pantalla::before {
+    transition: background 0.4s, opacity 0.4s;
+}
+
+.escena.dos .pantalla::before {
+    background: #050705;
+    mix-blend-mode: normal;
+}
+
+.escena.dos .logo {
+    display: none;
+}
+
+/* Las líneas de barrido quedan por encima del texto */
+.pantalla::after {
+    z-index: 2;
+}
+
+.terminal {
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    margin: 0;
+    padding: 5cqw 6cqw;
+    overflow: hidden;
+    font-family: var(--fuente-dos);
+    font-size: 4.6cqw;
+    line-height: 1.1;
+    color: #c8c8c8;
+    text-shadow: 0 0 0.6cqw rgba(220, 220, 220, 0.5);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.terminal .cursor {
+    animation: cursor 0.5s steps(1) infinite;
+}
+
+@keyframes cursor {
+    50% { opacity: 0; }
+}
+
+/* Tras el zoom ya no hace falta la zona clicable del computador */
+.escena.zoom .computador {
+    display: none;
+}
+
+.terminal {
+    display: none;
+}
+
+.escena.dos .terminal {
+    display: block;
+}
+
+/* ---------- Programas (juegos) dentro del monitor ---------- */
+
+.escena.ejecutando .terminal {
+    display: none;
+}
+
+.programa {
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    padding: 7cqw 4cqw 3cqw; /* arriba deja sitio al contador de tiempo */
+    box-sizing: border-box;
+    background: #000;
+}
+
+.programa canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+/* ---------- Contador de tiempo de juego (solo dentro de los juegos) ---------- */
+
+.reloj {
+    position: absolute;
+    z-index: 2; /* sobre el juego, bajo las líneas de barrido */
+    top: 1.8cqw;
+    right: 6cqw;
+    display: none;
+    font-family: var(--fuente-dos);
+    font-size: 4.4cqw;
+    line-height: 1;
+    letter-spacing: 0.2cqw;
+    color: #c8c8c8;
+    text-shadow: 0 0 0.6cqw rgba(220, 220, 220, 0.5);
+}
+
+.escena.ejecutando .reloj {
+    display: block;
+}
+
+/* Último minuto: en rojo y parpadeando */
+.reloj.urgente {
+    color: #ff4d4d;
+    text-shadow: 0 0 0.8cqw rgba(255, 60, 60, 0.7);
+    animation: cursor 1s steps(1) infinite;
+}
+
+/* ---------- Pantalla de error por tiempo agotado ---------- */
+
+/* Capas a pantalla completa dentro del monitor: error, login y carga */
+.capa-dos {
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    display: none;
+    place-items: center;
+    padding: 6cqw;
+    background: #050705;
+    font-family: var(--fuente-dos);
+    font-size: 4.4cqw;
+    line-height: 1.1;
+    -webkit-font-smoothing: none;
+}
+
+.escena.error .error-dos {
+    display: grid;
+}
+
+.escena.error .terminal {
+    display: none;
+}
+
+/* Recuadro gris con doble borde, como los avisos de MS-DOS */
+.caja-dos {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 3cqw 4cqw;
+    background: #aaaaaa;
+    color: #000;
+    border: 0.9cqw double #000;
+    outline: 1.2cqw solid #aaaaaa;
+    box-shadow: 2.2cqw 2.2cqw 0 #000;
+    animation: aparecer-error 0.15s steps(2);
+}
+
+.caja-dos p {
+    margin: 0 0 2.4cqw;
+}
+
+.caja-dos p:last-child {
+    margin-bottom: 0;
+}
+
+.caja-dos strong {
+    font-weight: normal;
+    background: #000;
+    color: #aaaaaa;
+    padding: 0 1cqw;
+}
+
+.caja-titulo {
+    text-align: center;
+    border-bottom: 0.5cqw solid #000;
+    padding-bottom: 1cqw;
+}
+
+.caja-dos .cursor {
+    animation: cursor 0.5s steps(1) infinite;
+}
+
+.error-fin {
+    white-space: pre-line;
+}
+
+.error-fin:empty {
+    display: none;
+}
+
+@keyframes aparecer-error {
+    from { opacity: 0; }
+}
+
+/* ---------- Lámpara apagada ---------- */
+
+/* La misma ilustración con la lámpara apagada, encima del fondo y debajo del monitor */
+.escena::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: url("../img/fondo0-apagado.png") center / 100% 100% no-repeat;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.escena.lampara-apagada::before {
+    opacity: 1;
+}
+
+/* Bombilla que falla: un par de destellos antes de quedarse apagada */
+.escena.lampara-apagada.parpadeo-lampara::before {
+    animation: apagar-lampara 1.4s linear;
+}
+
+@keyframes apagar-lampara {
+    0%   { opacity: 0; }
+    8%   { opacity: 1; }
+    14%  { opacity: 0.1; }
+    22%  { opacity: 1; }
+    30%  { opacity: 0.3; }
+    36%  { opacity: 1; }
+    48%  { opacity: 0.6; }
+    56%  { opacity: 1; }
+    100% { opacity: 1; }
+}
+
+/* Al encenderla con un clic: un destello corto y se queda encendida */
+.escena.encendiendo-lampara::before {
+    animation: encender-lampara 0.6s linear;
+}
+
+@keyframes encender-lampara {
+    0%   { opacity: 1; }
+    20%  { opacity: 0; }
+    35%  { opacity: 0.8; }
+    55%  { opacity: 0; }
+    100% { opacity: 0; }
+}
+
+/* Zona clicable de la lámpara (pantalla, brazo y base) en porcentajes de la imagen */
+.lampara {
+    position: absolute;
+    z-index: 2;
+    left: 6.3%;
+    top: 37.5%;
+    width: 18%;
+    height: 42.5%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    clip-path: polygon(45% 0.5%, 65% 0%, 100% 27%, 100% 43%, 55% 43%, 32% 52%, 25% 84%,
+        57% 87%, 57% 100%, 8% 100%, 8% 84%, 15% 72%, 0% 42%, 5% 34%, 45% 22%);
+}
+
+.lampara:focus-visible {
+    background: rgba(0, 255, 0, 0.25);
+}
+
+/* Con el zoom al monitor la lámpara queda fuera de la vista */
+.escena.zoom .lampara {
+    display: none;
+}
+
+/* ---------- Radio ---------- */
+
+/* Zona clicable de la radio; el hueco de abajo deja fuera la bola del joystick */
+.radio {
+    position: absolute;
+    z-index: 2;
+    left: 83%;
+    top: 51.9%;
+    width: 17%;
+    height: 23.8%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 55% 100%, 55% 78%, 10% 78%, 10% 100%, 0 100%);
+}
+
+.radio:focus-visible {
+    background: rgba(0, 255, 0, 0.25);
+}
+
+/* Mientras suena: un resplandor suave que late al ritmo, como los altavoces */
+.escena.radio-sonando .radio {
+    background: radial-gradient(ellipse at 50% 60%, rgba(255, 180, 255, 0.35), transparent 70%);
+    mix-blend-mode: screen;
+    animation: latido-radio 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes latido-radio {
+    from { opacity: 0.4; }
+    to   { opacity: 1; }
+}
+
+.escena.zoom .radio {
+    display: none;
+}
+
+/* ---------- Ventana de inicio de sesión ---------- */
+
+.escena.login .login-dos,
+.escena.cargando .carga-dos {
+    display: grid;
+}
+
+.escena.login .terminal,
+.escena.cargando .terminal {
+    display: none;
+}
+
+.login-dos {
+    pointer-events: auto;
+}
+
+.login-campo {
+    display: flex;
+    align-items: center;
+    gap: 1.5cqw;
+    margin-bottom: 2.4cqw;
+}
+
+.login-correo {
+    flex: 1;
+    min-width: 0;
+    padding: 0.4cqw 1cqw;
+    border: 0;
+    border-radius: 0;
+    outline: none;
+    background: #000;
+    color: #e0e0e0;
+    caret-color: #e0e0e0;
+    font: inherit;
+}
+
+.login-correo:disabled {
+    color: #888;
+}
+
+.login-mensaje {
+    min-height: 1.1em;
+}
+
+.login-mensaje.error {
+    background: #000;
+    color: #ff5555;
+    padding: 0 1cqw;
+    animation: cursor 0.5s steps(1) 4;
+}
+
+.login-ayuda {
+    text-align: center;
+    border-top: 0.5cqw solid #000;
+    padding-top: 1cqw;
+}
+
+/* ---------- Pantalla de carga: mejores puntajes estilo arcade ---------- */
+
+.carga {
+    width: 100%;
+    color: #e0e0e0;
+    text-align: center;
+}
+
+.carga p {
+    margin: 0 0 1.4cqw;
+}
+
+.carga-estado {
+    color: #9a9a9a;
+    text-align: left;
+}
+
+.carga-titulo {
+    color: #ffff55;
+    font-size: 6cqw;
+    letter-spacing: 0.6cqw;
+    text-shadow: 0 0 1cqw rgba(255, 255, 85, 0.6);
+    animation: cursor 0.8s steps(1) infinite;
+}
+
+.carga-juego {
+    color: #55ffff;
+}
+
+.carga-tabla {
+    margin: 0 0 1.4cqw;
+    padding: 0;
+    list-style: none;
+    font-size: 4cqw;
+}
+
+.carga-tabla li {
+    display: grid;
+    grid-template-columns: 6cqw 1fr auto;
+    gap: 2cqw;
+    text-align: left;
+}
+
+.carga-tabla li:nth-child(3n + 1) { color: #ff55ff; }
+.carga-tabla li:nth-child(3n + 2) { color: #55ff55; }
+.carga-tabla li:nth-child(3n)     { color: #55ffff; }
+
+.carga-tabla li.propia {
+    color: #ffff55;
+}
+
+.carga-tabla li.vacia {
+    display: block;
+    color: #9a9a9a;
+    text-align: center;
+}
+
+.carga-jugador {
+    color: #ffff55;
+}
+
+/* Clasificación general: columnas con el desglose por juego */
+.carga-tabla.con-extras li {
+    grid-template-columns: 6cqw 1fr repeat(var(--extras), 8cqw) 10cqw;
+    gap: 1.2cqw;
+}
+
+.carga-tabla.con-extras li span:nth-child(2) {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.carga-tabla.con-extras li span:nth-child(n + 3) {
+    text-align: right;
+}
+
+.carga-tabla li.cabecera {
+    color: #9a9a9a;
+    font-size: 3.4cqw;
+}
+
+/* ---------- Resultados en SM-BASIC (C:\RESULTADOS) ---------- */
+
+.basic-dos {
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    padding: 5cqw 6cqw;
+    background: #050705;
+    font-family: var(--fuente-dos);
+    font-size: 4.2cqw;
+    line-height: 1.15;
+    color: #c8c8c8;
+    text-shadow: 0 0 0.6cqw rgba(220, 220, 220, 0.5);
+}
+
+.escena.basic .basic-dos {
+    display: flex;
+}
+
+.escena.basic .terminal {
+    display: none;
+}
+
+.basic-texto {
+    position: relative; /* referencia para offsetTop de cada línea */
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    scroll-behavior: smooth;
+}
+
+.linea-basic {
+    min-height: 1.15em;
+    white-space: pre;
+}
+
+.linea-basic.oculta { visibility: hidden; }
+.linea-basic.titulo { color: #55ff55; }
+.linea-basic.tenue { color: #8a8a8a; }
+.linea-basic.aviso { color: #ffff55; }
+.linea-basic.error { color: #ff5555; }
+.linea-basic.cabecera { color: #55ffff; }
+.linea-basic.pendiente { color: #4a4a4a; }
+.linea-basic.podio { color: #55ffff; }
+
+.linea-basic.oro {
+    color: #ffff55;
+    text-shadow: 0 0 1cqw rgba(255, 220, 60, 0.8);
+}
+
+.linea-basic.revelada {
+    animation: revelar-fila 0.3s steps(3);
+}
+
+@keyframes revelar-fila {
+    0%   { opacity: 0; }
+    50%  { opacity: 1; filter: brightness(2); }
+}
+
+.copa-dibujo {
+    color: #ffcc33;
+    text-shadow: 0 0 1.2cqw rgba(255, 200, 50, 0.9);
+}
+
+.copa-texto {
+    color: #ffff55;
+}
+
+.linea-basic.copa:not(.oculta) {
+    animation: revelar-fila 0.6s steps(4);
+}
+
+/* Cursor rectangular de BASIC */
+.bloque {
+    display: inline-block;
+    width: 1ch;
+    height: 1em;
+    vertical-align: -0.15em;
+    background: currentColor;
+    animation: cursor 0.5s steps(1) infinite;
+}
+
+.basic-ayuda {
+    min-height: 1.15em;
+    margin: 1.5cqw 0 0;
+    padding-top: 1cqw;
+    border-top: 0.4cqw solid #333;
+    color: #8a8a8a;
+}
+
+.basic-ayuda.suspenso {
+    color: #ffff55;
+    animation: cursor 0.6s steps(1) infinite;
+}
+
+/* ---------- Despedida (SALIR en C:\RESULTADOS) ---------- */
+
+.escena.despedida .despedida-dos {
+    display: grid;
+}
+
+.escena.despedida .terminal {
+    display: none;
+}
+
+.despedida {
+    text-align: center;
+}
+
+.despedida p {
+    margin: 0 0 4cqw;
+    min-height: 1.1em;
+    white-space: pre;
+}
+
+.despedida-1 {
+    color: #ffff55;
+    font-size: 6cqw;
+    text-shadow: 0 0 1.2cqw rgba(255, 255, 85, 0.6);
+}
+
+.despedida-2 {
+    color: #55ffff;
+    font-size: 5.4cqw;
+    text-shadow: 0 0 1.2cqw rgba(85, 255, 255, 0.5);
+}
+
+/* Telón negro del final: cubre toda la página con un fundido lento */
+.telon {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    background: #000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 3s ease-in;
+}
+
+body.fin .telon {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* ---------- Póster de E.T.: la figura sale volando ---------- */
+
+/* Zona clicable del póster */
+.poster-et {
+    position: absolute;
+    z-index: 2;
+    left: 9.3%;
+    top: 6.9%;
+    width: 13.4%;
+    height: 32.8%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.poster-et:focus-visible {
+    outline: 3px dashed #0f0;
+}
+
+.escena.zoom .poster-et {
+    display: none;
+}
+
+/* Parche de la luna sin la figura y la figura suelta, en el mismo sitio que en la imagen */
+.et-luna,
+.et-figura {
+    position: absolute;
+    z-index: 1;
+    left: 14.8923%;
+    top: 14.1339%;
+    width: 4.8445%;
+    height: 8.5016%;
+    display: none;
+    pointer-events: none;
+}
+
+.et-luna {
+    background: url("../img/et-luna.png") center / 100% 100% no-repeat;
+}
+
+.escena.lampara-apagada .et-luna {
+    background-image: url("../img/et-luna-apagado.png");
+}
+
+.et-figura {
+    transform-origin: 50% 60%;
+}
+
+.escena.et-fuera .et-luna,
+.escena.et-fuera .et-figura {
+    display: block;
+}

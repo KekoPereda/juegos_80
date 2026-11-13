@@ -1,0 +1,112 @@
+[
+    {
+        "correo": "erik.pereda@grupo-sm.com",
+        "nombre": "ERIK PEREDA"
+    },
+    {
+        "correo": "marcela.indo@grupo-sm.com",
+        "nombre": "MARCELA INDO"
+    },
+    {
+        "correo": "alejandra.cantillano@grupo-sm.com",
+        "nombre": "ALEJANDRA CANTILLANO"
+    },
+    {
+        "correo": "astrid.muñoz@grupo-sm.com",
+        "nombre": "ASTRID MUÑOZ"
+    },
+    {
+        "correo": "vicente.duque@grupo-sm.com",
+        "nombre": "VICENTE DUQUE"
+    },
+    {
+        "correo": "ana.soto@simulado.local",
+        "nombre": "ANA SOTO",
+        "simulado": true
+    },
+    {
+        "correo": "luis.rojas@simulado.local",
+        "nombre": "LUIS ROJAS",
+        "simulado": true
+    },
+    {
+        "correo": "pedro.vera@simulado.local",
+        "nombre": "PEDRO VERA",
+        "simulado": true
+    },
+    {
+        "correo": "sofia.lara@simulado.local",
+        "nombre": "SOFIA LARA",
+        "simulado": true
+    },
+    {
+        "correo": "tomas.paz@simulado.local",
+        "nombre": "TOMAS PAZ",
+        "simulado": true
+    },
+    {
+        "correo": "clara.ruiz@simulado.local",
+        "nombre": "CLARA RUIZ",
+        "simulado": true
+    },
+    {
+        "correo": "diego.mora@simulado.local",
+        "nombre": "DIEGO MORA",
+        "simulado": true
+    },
+    {
+        "correo": "elena.cruz@simulado.local",
+        "nombre": "ELENA CRUZ",
+        "simulado": true
+    },
+    {
+        "correo": "felipe.olea@simulado.local",
+        "nombre": "FELIPE OLEA",
+        "simulado": true
+    },
+    {
+        "correo": "camila.nunez@simulado.local",
+        "nombre": "CAMILA NUÑEZ",
+        "simulado": true
+    },
+    {
+        "correo": "javier.toro@simulado.local",
+        "nombre": "JAVIER TORO",
+        "simulado": true
+    },
+    {
+        "correo": "paula.reyes@simulado.local",
+        "nombre": "PAULA REYES",
+        "simulado": true
+    },
+    {
+        "correo": "matias.silva@simulado.local",
+        "nombre": "MATIAS SILVA",
+        "simulado": true
+    },
+    {
+        "correo": "valentina.ross@simulado.local",
+        "nombre": "VALENTINA ROSS",
+        "simulado": true
+    },
+    {
+        "correo": "ignacio.fuentes@simulado.local",
+        "nombre": "IGNACIO FUENTES",
+        "simulado": true
+    },
+    {
+        "correo": "catalina.vidal@simulado.local",
+        "nombre": "CATALINA VIDAL",
+        "simulado": true
+    },
+    {
+        "correo": "benjamin.araya@simulado.local",
+        "nombre": "BENJAMIN ARAYA",
+        "simulado": true
+    },
+    {
+        "correo": "fernanda.leiva@simulado.local",
+        "nombre": "FERNANDA LEIVA",
+        "simulado": true
+    }
+]
