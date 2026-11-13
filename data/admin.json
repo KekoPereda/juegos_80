@@ -1,5 +1,20 @@
 {
-    "simulacion": true,
+    "usuariosReales": true,
+    "rankingReal": false,
+    "usuariosSimulacion": [
+        {
+            "correo": "erik.pereda@grupo-sm.com",
+            "nombre": "ERIK PEREDA"
+        },
+        {
+            "correo": "marcela.indo@grupo-sm.com",
+            "nombre": "MARCELA INDO"
+        },
+        {
+            "correo": "astrid.muñoz@grupo-sm.com",
+            "nombre": "ASTRID MUÑOZ"
+        }
+    ],
     "administradores": [
         {
             "usuario": "SuperAdmin",

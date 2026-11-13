@@ -1,9 +1,12 @@
-// Modo simulación: sin servidor (por ejemplo en Vercel, donde no hay PHP).
-// Se activa con "simulacion": true en data/admin.json. En este modo:
-//   - el inicio de sesión acepta cualquier correo válido,
-//   - el ranking y la clasificación general usan jugadores de ejemplo (no los datos reales),
-//   - los puntajes del visitante se guardan solo en su navegador (localStorage),
-//   - PRINT "resultados" muestra la clasificación simulada sin pedir usuario ni contraseña.
+// Simulación: dos interruptores en data/admin.json, independientes entre sí.
+//   "usuariosReales": false -> el acceso no usa el servidor (por ejemplo en Vercel, donde no hay PHP):
+//       solo pueden jugar los correos de "usuariosSimulacion" en data/admin.json
+//       (si esa lista no existe o está vacía, sirve cualquier correo válido).
+//       Con true, el servidor comprueba el correo en data/usuarios.real.json.
+//   "rankingReal": false -> el ranking y la clasificación general usan jugadores de ejemplo,
+//       los puntajes del visitante se guardan solo en su navegador (localStorage) y
+//       PRINT "resultados" muestra la clasificación simulada sin pedir usuario ni contraseña.
+//       Con true, se usa data/ranking.real.json.
 // La simulación imita las respuestas de api/ranking.php, así que el resto del código no cambia.
 
 const CLAVE_SIMULACION = "smdos-simulacion-puntajes";
@@ -33,28 +36,42 @@ const JUGADORES_SIMULADOS = [
     ["SOFIA LARA", { BLOQUES: [1704, "2026-11-12 10:41:00"], RATON: [3169, "2026-11-12 02:57:00"] }],
 ];
 
-// ---------- ¿Está activo? (se comprueba una sola vez) ----------
-// 1. data/admin.json: en Vercel se sirve como archivo estático. En MAMP, data/.htaccess lo bloquea.
-// 2. api/ranking.php: en MAMP informa si admin.json tiene la simulación activada.
+// ---------- ¿Qué se simula? (se comprueba una sola vez) ----------
+// 1. data/admin.json: en Vercel se sirve como archivo estático. En un servidor con PHP, data/.htaccess lo bloquea.
+// 2. api/ranking.php: en un servidor con PHP informa de la configuración de admin.json.
+// Si no se puede leer ninguno, todo es real (y los errores se verán como "sin conexión").
 
 let promesaSimulacion = null;
+let usuariosSimulacion = []; // [{ correo, nombre }] que pueden jugar con "usuariosReales": false
 
-function esSimulacion() {
+// -> { usuarios: true si el acceso es simulado, ranking: true si el ranking es simulado }
+function modoSimulacion() {
+    const leer = (datos) => {
+        if (!datos || typeof datos !== "object" || Array.isArray(datos)) return null;
+        usuariosSimulacion = Array.isArray(datos.usuariosSimulacion) ? datos.usuariosSimulacion : [];
+        return { usuarios: datos.usuariosReales === false, ranking: datos.rankingReal === false };
+    };
     promesaSimulacion ??= (async () => {
         try {
             const r = await fetch("data/admin.json", { cache: "no-store" });
-            if (r.ok && (await r.json())?.simulacion === true) return true;
+            const modo = r.ok ? leer(await r.json()) : null;
+            if (modo) return modo;
         } catch (e) { /* bloqueado o sin servidor */ }
         try {
             const r = await fetch(API_RANKING, { cache: "no-store" });
-            return (await r.json())?.simulacion === true;
+            return leer(await r.json()) ?? { usuarios: false, ranking: false };
         } catch (e) {
-            return false;
+            return { usuarios: false, ranking: false };
         }
     })();
     return promesaSimulacion;
 }
-esSimulacion(); // se comprueba al cargar la página para que luego responda al instante
+
+// true si el ranking es simulado (ranking, puntajes y resultados)
+async function esSimulacion() {
+    return (await modoSimulacion()).ranking;
+}
+modoSimulacion(); // se comprueba al cargar la página para que luego responda al instante
 
 // ---------- Puntajes del visitante (solo en su navegador) ----------
 // { correo: { nombre, juegos: { JUEGO: { puntos, fecha } } } }
@@ -151,8 +168,12 @@ function apiSimulada(datos) {
 
     const correo = String(datos.correo ?? "").trim().toLowerCase();
     switch (datos.accion) {
-        case "login":
-            return { ok: true, correo, nombre: puntajesSim[correo]?.nombre ?? nombreSimulado(correo), simulacion: true };
+        case "login": {
+            const registrado = usuariosSimulacion.find((u) => String(u.correo ?? "").trim().toLowerCase() === correo);
+            if (usuariosSimulacion.length && !registrado) return { ok: false, error: "Usuario no registrado" };
+            const nombre = registrado?.nombre ? String(registrado.nombre).toUpperCase() : nombreSimulado(correo);
+            return { ok: true, correo, nombre, simulacion: true };
+        }
 
         case "puntaje": {
             const juego = String(datos.juego ?? "").toUpperCase();
@@ -161,7 +182,9 @@ function apiSimulada(datos) {
                 return { ok: false, error: "Puntaje no válido" };
             }
             puntajesSim = leerPuntajesSim(); // por si otra pestaña guardó algo
-            const jugador = (puntajesSim[correo] ??= { nombre: nombreSimulado(correo), juegos: {} });
+            const nombre = datos.nombre ? String(datos.nombre).toUpperCase() : nombreSimulado(correo);
+            const jugador = (puntajesSim[correo] ??= { nombre, juegos: {} });
+            jugador.nombre = nombre;
             const guardado = puntos > (jugador.juegos[juego]?.puntos ?? -1);
             if (guardado) {
                 jugador.juegos[juego] = { puntos, fecha: fechaAhora() };

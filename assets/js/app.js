@@ -376,10 +376,12 @@ let maximoGeneral = 3000;
 let concurso = null;  // { nombre, desde, hasta, estado: "abierto" | "proximo" | "cerrado" }
 let enviados = {};    // mejor puntaje ya enviado en esta sesión, por juego
 
-// En modo simulación (assets/js/simulacion.js) no se usa el servidor: responde la simulación
+// Lo que esté simulado en data/admin.json (assets/js/simulacion.js) no usa el servidor
 async function api(datos) {
+    const modo = await modoSimulacion();
+    const simulado = datos?.accion === "login" ? modo.usuarios : modo.ranking;
     let json;
-    if (await esSimulacion()) {
+    if (simulado) {
         json = apiSimulada(datos);
     } else {
         const respuesta = await fetch(API_RANKING, datos
@@ -401,7 +403,7 @@ function mejorPuntaje(juego) {
 function registrarPuntaje(juego, puntos) {
     if (!usuario || !(puntos > 0) || puntos <= (enviados[juego] ?? 0)) return;
     enviados[juego] = puntos;
-    api({ accion: "puntaje", correo: usuario.correo, juego, puntos }).catch(() => {
+    api({ accion: "puntaje", correo: usuario.correo, nombre: usuario.nombre, juego, puntos }).catch(() => {
         enviados[juego] = 0; // se reintentará con el próximo puntaje
     });
 }
@@ -419,8 +421,10 @@ function pedirLogin() {
         mensajeLogin.className = "login-mensaje";
         escena.classList.add("login");
         setTimeout(() => inputCorreo.focus({ preventScroll: true }), 0);
-        esSimulacion().then((simulacion) => {
-            if (simulacion && !mensajeLogin.textContent) mensajeLogin.textContent = "MODO SIMULACIÓN: sirve cualquier correo";
+        modoSimulacion().then((modo) => {
+            if (mensajeLogin.textContent) return;
+            if (modo.usuarios) mensajeLogin.textContent = "MODO SIMULACIÓN";
+            else if (modo.ranking) mensajeLogin.textContent = "RANKING DE PRUEBA";
         });
 
         const terminar = (resultado) => {

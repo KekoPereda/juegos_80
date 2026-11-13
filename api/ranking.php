@@ -8,12 +8,14 @@
 //   POST ranking.php {accion:"resultados", usuario, clave}
 //                                                     -> clasificación general completa (solo administradores)
 //
-// Usuarios registrados: data/usuarios.json  [{ "correo": "...", "nombre": "..." }]
-// Ranking:              data/ranking.json   { "JUEGO": { "correo": { "puntos": 0, "fecha": "..." } } }
-// Administradores:      data/admin.json     { "simulacion": false,
+// Usuarios registrados: data/usuarios.real.json  [{ "correo": "...", "nombre": "..." }]
+// Ranking:              data/ranking.real.json   { "JUEGO": { "correo": { "puntos": 0, "fecha": "..." } } }
+// Configuración:        data/admin.json     { "usuariosReales": true, "rankingReal": true,
 //                                               "administradores": [{ "usuario": "...", "clave": "<hash de password_hash>" }] }
-//                       Con "simulacion": true la API no lee ni guarda datos: el navegador usa
-//                       assets/js/simulacion.js (jugadores de ejemplo, resultados sin contraseña).
+//   "usuariosReales": false -> la API no comprueba correos; el navegador usa "usuariosSimulacion" de admin.json
+//                              (para hosting sin PHP, como Vercel).
+//   "rankingReal": false    -> la API no entrega ni guarda puntajes; el navegador usa assets/js/simulacion.js
+//                              (jugadores de ejemplo, puntajes en el navegador, resultados sin contraseña).
 // Concurso (opcional):  data/concurso.json  { "nombre": "...", "desde": "AAAA-MM-DD", "hasta": "AAAA-MM-DD" }
 //
 // Clasificación general: en cada juego el mejor puntaje vale 1.000 y los demás la parte
@@ -31,8 +33,8 @@ const PUNTOS_GENERAL = 1000; // lo que vale el mejor puntaje de cada juego en la
 const TOP = 10;
 
 $dirDatos = __DIR__ . '/../data';
-$archivoUsuarios = "$dirDatos/usuarios.json";
-$archivoRanking = "$dirDatos/ranking.json";
+$archivoUsuarios = "$dirDatos/usuarios.real.json";
+$archivoRanking = "$dirDatos/ranking.real.json";
 $archivoConcurso = "$dirDatos/concurso.json";
 $archivoAdmin = "$dirDatos/admin.json";
 
@@ -117,7 +119,9 @@ function tablasPorJuego(array $ranking, array $usuarios, array $concurso): array
                 'fecha' => $r['fecha'] ?? '',
             ];
         }
-        usort($filas, fn($a, $b) => $b['puntos'] <=> $a['puntos'] ?: strcmp($a['fecha'], $b['fecha']));
+        usort($filas, function ($a, $b) {
+            return $b['puntos'] <=> $a['puntos'] ?: strcmp($a['fecha'], $b['fecha']);
+        });
         $salida[$juego] = $filas;
     }
     return $salida;
@@ -133,7 +137,7 @@ function tablaGeneral(array $tablas): array
         if ($mejor <= 0) continue;
         foreach ($filas as $f) {
             $j = &$jugadores[$f['correo']];
-            $j ??= ['nombre' => $f['nombre'], 'total' => 0, 'juegos' => array_fill_keys(JUEGOS, 0), 'fecha' => ''];
+            if ($j === null) $j = ['nombre' => $f['nombre'], 'total' => 0, 'juegos' => array_fill_keys(JUEGOS, 0), 'fecha' => ''];
             $relativo = (int) round($f['puntos'] * PUNTOS_GENERAL / $mejor);
             $j['juegos'][$juego] = $relativo;
             $j['total'] += $relativo;
@@ -142,7 +146,9 @@ function tablaGeneral(array $tablas): array
         }
     }
     $filas = array_values($jugadores);
-    usort($filas, fn($a, $b) => $b['total'] <=> $a['total'] ?: strcmp($a['fecha'], $b['fecha']));
+    usort($filas, function ($a, $b) {
+        return $b['total'] <=> $a['total'] ?: strcmp($a['fecha'], $b['fecha']);
+    });
     return $filas;
 }
 
@@ -150,10 +156,12 @@ function tablaGeneral(array $tablas): array
 function datosPublicos(array $ranking, string $archivoUsuarios, array $concurso): array
 {
     $tablas = tablasPorJuego($ranking, leerJson($archivoUsuarios, []), $concurso);
-    $sinCorreo = fn($filas) => array_map(function ($f) {
-        unset($f['correo']);
-        return $f;
-    }, array_slice($filas, 0, TOP));
+    $sinCorreo = function ($filas) {
+        return array_map(function ($f) {
+            unset($f['correo']);
+            return $f;
+        }, array_slice($filas, 0, TOP));
+    };
 
     $publico = [];
     foreach ($tablas as $juego => $filas) $publico[$juego] = $sinCorreo($filas);
@@ -172,18 +180,23 @@ function datosPublicos(array $ranking, string $archivoUsuarios, array $concurso)
 $metodo = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 $concurso = concurso($archivoConcurso);
 
-// admin.json: { "simulacion": bool, "administradores": [...] } (también admite solo la lista)
+// admin.json: { "usuariosReales": bool, "rankingReal": bool, "administradores": [...] }
+// (también admite solo la lista de administradores; sin los interruptores, todo es real)
 $admin = leerJson($archivoAdmin, []);
-$simulacion = ($admin['simulacion'] ?? false) === true;
-$administradores = array_is_list($admin) ? $admin : ($admin['administradores'] ?? []);
+$listaAdmin = array_values($admin) === $admin;
+$usuariosReales = $listaAdmin || ($admin['usuariosReales'] ?? true) === true;
+$rankingReal = $listaAdmin || ($admin['rankingReal'] ?? true) === true;
+$administradores = $listaAdmin ? $admin : ($admin['administradores'] ?? []);
 
-// Modo simulación: el servidor no entrega ni guarda datos reales
-if ($simulacion) {
-    responder(['ok' => $metodo === 'GET', 'simulacion' => true, 'error' => 'Modo simulación']);
-}
+// El navegador consulta esta configuración para saber qué partes simula
+$config = [
+    'usuariosReales' => $usuariosReales,
+    'rankingReal' => $rankingReal,
+    'usuariosSimulacion' => $usuariosReales ? [] : ($admin['usuariosSimulacion'] ?? []),
+];
 
 if ($metodo === 'GET') {
-    responder(['ok' => true] + datosPublicos(leerJson($archivoRanking, []), $archivoUsuarios, $concurso));
+    responder(['ok' => true] + $config + ($rankingReal ? datosPublicos(leerJson($archivoRanking, []), $archivoUsuarios, $concurso) : []));
 }
 
 if ($metodo !== 'POST') {
@@ -196,7 +209,13 @@ if (!is_array($entrada)) responder(['ok' => false, 'error' => 'Petición no vál
 $correo = mb_strtolower(trim((string) ($entrada['correo'] ?? '')));
 $usuario = $correo !== '' ? buscarUsuario($correo, $archivoUsuarios) : null;
 
-switch ($entrada['accion'] ?? '') {
+$accion = $entrada['accion'] ?? '';
+if ($accion === 'login' && !$usuariosReales) responder(['ok' => false, 'error' => 'Usuarios simulados'] + $config);
+if (($accion === 'puntaje' || $accion === 'resultados') && !$rankingReal) {
+    responder(['ok' => false, 'error' => 'Ranking simulado'] + $config);
+}
+
+switch ($accion) {
     case 'login':
         if (!$usuario) responder(['ok' => false, 'error' => 'Usuario no registrado']);
         responder([

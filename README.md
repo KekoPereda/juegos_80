@@ -14,8 +14,8 @@ Necesita un servidor con PHP (por ejemplo MAMP) para el inicio de sesión y el r
 
 ## Usuarios y ranking
 
-- **Usuarios registrados:** `data/usuarios.json`. Para dar de alta a alguien, añade una línea `{ "correo": "...", "nombre": "..." }`. El nombre es lo que aparece en el ranking.
-- **Ranking:** `data/ranking.json` guarda el mejor puntaje de cada usuario en cada juego. Se actualiza solo y no se borra al reiniciar: los datos de todos los usuarios se acumulan. Para reiniciar el ranking, deja el archivo con `{}`.
+- **Usuarios registrados:** `data/usuarios.real.json`. Para dar de alta a alguien, añade una línea `{ "correo": "...", "nombre": "..." }`. El nombre es lo que aparece en el ranking.
+- **Ranking:** `data/ranking.real.json` guarda el mejor puntaje de cada usuario en cada juego. Se actualiza solo y no se borra al reiniciar: los datos de todos los usuarios se acumulan. Para reiniciar el ranking, deja el archivo con `{}`.
 - Se guarda el puntaje al terminar cada partida y al cerrar el juego, con `ESC` o porque se acaba el tiempo. Solo se escribe si supera el mejor puntaje anterior del usuario.
 - Antes de cada juego se muestra la tabla de mejores puntajes, al estilo arcade (`ENTER` la salta). El comando `RANKING` de la consola muestra las tablas de todos los juegos.
 - **Clasificación general (premio único):** como cada juego da puntajes muy distintos, en cada juego el mejor puntaje vale 1.000 y los demás reciben la parte proporcional (`puntaje / mejor × 1.000`). Se suman los tres juegos, con un máximo de 3.000, así que gana el jugador más completo. Si hay empate, gana quien consiguió antes su último puntaje.
@@ -23,8 +23,11 @@ Necesita un servidor con PHP (por ejemplo MAMP) para el inicio de sesión y el r
 - **Resultados del concurso (oculto):** `cd..`, `cd resultados` y `print "resultados"`. Se piden usuario y contraseña (`data/admin.json`; en modo simulación no se piden; el usuario no distingue mayúsculas) y se muestra la clasificación general completa al estilo BASIC, con cursor de bloque. Los puestos se revelan desde el último hasta el primero, con pausas más largas al llegar al 3.º y al 2.º y un momento de suspenso antes del campeón, que aparece con una copa y una fanfarria. Las flechas, RePág/AvPág e Inicio/Fin recorren la tabla; ESC vuelve a SM-DOS. Escribir `resultados` como si fuera un programa da `?Syntax error`, y `print resultados` sin comillas da ` 0`, como en GW-BASIC.
 - **Final (`salir`):** después de ver los resultados, al escribir `salir` (o `salir()` / `function salir`) en `C:\RESULTADOS` aparece "Muchas gracias por participar / Hasta el próximo año" con una melodía. Luego la cámara vuelve al escritorio, el PC se apaga, la lámpara se apaga y todo funde a negro; la música de la radio, si sonaba, se apaga poco a poco. Para empezar de nuevo hay que recargar la página. Si se escribe `salir` antes de ver los resultados, responde `?Illegal function call`.
 - **Cambiar la contraseña de resultados:** genera el hash con `php -r 'echo password_hash("nueva-clave", PASSWORD_DEFAULT);'` y pégalo en el campo `clave` de `data/admin.json` (dentro de `administradores`). El nombre está en el campo `usuario`. Puede haber varios administradores.
-- **Modo simulación (para Vercel u otro hosting sin PHP):** en `data/admin.json`, pon `"simulacion": true`. El servidor deja de usarse: el inicio de sesión acepta cualquier correo, el ranking y la clasificación general muestran jugadores de ejemplo (de `assets/js/simulacion.js`, no los datos reales) más los puntajes del visitante, que se guardan solo en su navegador. `print "resultados"` muestra la clasificación simulada sin pedir usuario ni contraseña. Con `"simulacion": false` todo vuelve a funcionar con el servidor y los datos reales.
-  - **Subir a Vercel:** activa la simulación antes de publicar. `.vercelignore` evita que se suban `api/` y los archivos con correos y puntajes reales, pero `data/admin.json` sí se publica (Vercel no aplica `data/.htaccess`), incluido el hash de la contraseña. Si te preocupa, en la copia de Vercel puedes dejar `"administradores": []`.
+- **Simulación (`data/admin.json`):** dos interruptores independientes.
+  - `"usuariosReales"`: con `true`, el servidor comprueba el correo en `data/usuarios.real.json`. Con `false` (hosting sin PHP, como Vercel), solo pueden jugar los correos de `usuariosSimulacion` del mismo archivo (si la lista está vacía, sirve cualquier correo).
+  - `"rankingReal"`: con `true`, se usa `data/ranking.real.json`. Con `false`, el ranking y la clasificación general muestran jugadores de ejemplo (de `assets/js/simulacion.js`) más los puntajes del visitante, que se guardan solo en su navegador, y `print "resultados"` muestra la clasificación simulada sin pedir usuario ni contraseña.
+  - Combinaciones: **prueba de acceso** `true` / `false` (usuarios reales, ranking de ejemplo); **producción** `true` / `true`; **Vercel** `false` / `false`. La pantalla de acceso muestra `RANKING DE PRUEBA` o `MODO SIMULACIÓN` cuando algo está simulado.
+  - **Subir a Vercel:** pon los dos interruptores en `false` antes de publicar. `.vercelignore` evita que se suban `api/` y los archivos con correos y puntajes reales, pero `data/admin.json` sí se publica (Vercel no aplica `data/.htaccess`), incluido el hash de la contraseña. Si te preocupa, en la copia de Vercel puedes dejar `"administradores": []`.
 - `api/ranking.php` es el único que lee y escribe esos archivos; `data/.htaccess` impide descargarlos directamente.
 - La carpeta `data/` necesita permiso de escritura para el usuario del servidor web.
 
@@ -62,8 +65,8 @@ El tiempo se guarda en el navegador (`localStorage`, clave `smdos-tiempo-juego`)
 ```
 index.html                  Página principal
 api/ranking.php             Inicio de sesión y ranking (lee y escribe data/*.json)
-data/usuarios.json          Usuarios registrados
-data/ranking.json           Mejor puntaje de cada usuario en cada juego
+data/usuarios.real.json     Usuarios registrados
+data/ranking.real.json      Mejor puntaje de cada usuario en cada juego
 data/concurso.json          Fechas del concurso (opcional)
 data/admin.json             Modo simulación y usuarios con acceso a C:\RESULTADOS (contraseña cifrada)
 .vercelignore               Archivos que no se suben a Vercel (datos reales y PHP)
