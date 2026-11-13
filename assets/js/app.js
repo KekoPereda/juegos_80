@@ -376,11 +376,17 @@ let maximoGeneral = 3000;
 let concurso = null;  // { nombre, desde, hasta, estado: "abierto" | "proximo" | "cerrado" }
 let enviados = {};    // mejor puntaje ya enviado en esta sesión, por juego
 
+// En modo simulación (assets/js/simulacion.js) no se usa el servidor: responde la simulación
 async function api(datos) {
-    const respuesta = await fetch(API_RANKING, datos
-        ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(datos), keepalive: true }
-        : { cache: "no-store" });
-    const json = await respuesta.json();
+    let json;
+    if (await esSimulacion()) {
+        json = apiSimulada(datos);
+    } else {
+        const respuesta = await fetch(API_RANKING, datos
+            ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(datos), keepalive: true }
+            : { cache: "no-store" });
+        json = await respuesta.json();
+    }
     if (json.ranking) ranking = json.ranking;
     if (json.general) general = json.general;
     if (json.maximoGeneral) maximoGeneral = json.maximoGeneral;
@@ -413,6 +419,9 @@ function pedirLogin() {
         mensajeLogin.className = "login-mensaje";
         escena.classList.add("login");
         setTimeout(() => inputCorreo.focus({ preventScroll: true }), 0);
+        esSimulacion().then((simulacion) => {
+            if (simulacion && !mensajeLogin.textContent) mensajeLogin.textContent = "MODO SIMULACIÓN: sirve cualquier correo";
+        });
 
         const terminar = (resultado) => {
             inputCorreo.removeEventListener("keydown", alPulsar);

@@ -1,0 +1,8 @@
+# En Vercel no hay PHP: el sitio funciona en modo simulación ("simulacion": true en data/admin.json).
+# Estos archivos no se suben para que los correos y puntajes reales no queden públicos.
+api/
+data/usuarios.json
+data/usuarios.real.json
+data/ranking.json
+data/ranking.real.json
+data/concurso.json

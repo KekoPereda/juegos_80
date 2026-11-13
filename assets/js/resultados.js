@@ -1,5 +1,5 @@
 // Resultados del concurso al estilo BASIC, dentro de C:\RESULTADOS.
-//   PRINT "resultados"  pide usuario y contraseña (data/admin.json) y muestra la clasificación
+//   PRINT "resultados"  pide usuario y contraseña (data/admin.json; en modo simulación no) y muestra la clasificación
 //                       general completa, revelándola desde el último lugar hasta el primero.
 //   RESULTADOS          escrito como programa da "?Syntax error" (la pista es PRINT).
 //   SALIR               (o SALIR(), FUNCTION SALIR) tras ver los resultados: despedida, vuelta
@@ -151,24 +151,34 @@ async function abrirResultados() {
     await escribirBasic("SM-BASIC Versión 1.0", "", 350);
     await escribirBasic("(C) Copyright SM 1986", "", 350);
     await escribirBasic("", "", 200);
-    await escribirBasic("ACCESO RESTRINGIDO: RESULTADOS", "aviso", 400);
-    if (!vigente()) return;
-
-    const usuarioAdmin = await leerLinea("USUARIO? ", false, miSesion);
-    if (usuarioAdmin === null || !vigente()) return cerrarResultados(miSesion);
-    const clave = await leerLinea("CONTRASEÑA? ", true, miSesion);
-    if (clave === null || !vigente()) return cerrarResultados(miSesion);
-
-    basicAyuda.textContent = "";
-    const verificando = await escribirBasic("Verificando", "", 0);
-    SonidoPC.accesos(1500);
     let datos = null;
-    try {
-        [datos] = await Promise.all([
-            api({ accion: "resultados", usuario: usuarioAdmin.trim(), clave }),
-            animarPuntos(verificando, 1500),
-        ]);
-    } catch (error) { /* sin servidor */ }
+    if (await esSimulacion()) {
+        // Modo simulación: sin usuario ni contraseña, con los resultados de ejemplo
+        await escribirBasic("MODO SIMULACIÓN: RESULTADOS DE EJEMPLO", "aviso", 400);
+        if (!vigente()) return;
+        basicAyuda.textContent = "";
+        const leyendo = await escribirBasic("Leyendo", "", 0);
+        SonidoPC.accesos(1500);
+        [datos] = await Promise.all([api({ accion: "resultados" }), animarPuntos(leyendo, 1500)]);
+    } else {
+        await escribirBasic("ACCESO RESTRINGIDO: RESULTADOS", "aviso", 400);
+        if (!vigente()) return;
+
+        const usuarioAdmin = await leerLinea("USUARIO? ", false, miSesion);
+        if (usuarioAdmin === null || !vigente()) return cerrarResultados(miSesion);
+        const clave = await leerLinea("CONTRASEÑA? ", true, miSesion);
+        if (clave === null || !vigente()) return cerrarResultados(miSesion);
+
+        basicAyuda.textContent = "";
+        const verificando = await escribirBasic("Verificando", "", 0);
+        SonidoPC.accesos(1500);
+        try {
+            [datos] = await Promise.all([
+                api({ accion: "resultados", usuario: usuarioAdmin.trim(), clave }),
+                animarPuntos(verificando, 1500),
+            ]);
+        } catch (error) { /* sin servidor */ }
+    }
     if (!vigente()) return;
 
     if (!datos?.ok) {

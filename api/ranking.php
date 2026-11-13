@@ -10,7 +10,10 @@
 //
 // Usuarios registrados: data/usuarios.json  [{ "correo": "...", "nombre": "..." }]
 // Ranking:              data/ranking.json   { "JUEGO": { "correo": { "puntos": 0, "fecha": "..." } } }
-// Administradores:      data/admin.json     [{ "usuario": "...", "clave": "<hash de password_hash>" }]
+// Administradores:      data/admin.json     { "simulacion": false,
+//                                               "administradores": [{ "usuario": "...", "clave": "<hash de password_hash>" }] }
+//                       Con "simulacion": true la API no lee ni guarda datos: el navegador usa
+//                       assets/js/simulacion.js (jugadores de ejemplo, resultados sin contraseña).
 // Concurso (opcional):  data/concurso.json  { "nombre": "...", "desde": "AAAA-MM-DD", "hasta": "AAAA-MM-DD" }
 //
 // Clasificación general: en cada juego el mejor puntaje vale 1.000 y los demás la parte
@@ -169,6 +172,16 @@ function datosPublicos(array $ranking, string $archivoUsuarios, array $concurso)
 $metodo = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 $concurso = concurso($archivoConcurso);
 
+// admin.json: { "simulacion": bool, "administradores": [...] } (también admite solo la lista)
+$admin = leerJson($archivoAdmin, []);
+$simulacion = ($admin['simulacion'] ?? false) === true;
+$administradores = array_is_list($admin) ? $admin : ($admin['administradores'] ?? []);
+
+// Modo simulación: el servidor no entrega ni guarda datos reales
+if ($simulacion) {
+    responder(['ok' => $metodo === 'GET', 'simulacion' => true, 'error' => 'Modo simulación']);
+}
+
 if ($metodo === 'GET') {
     responder(['ok' => true] + datosPublicos(leerJson($archivoRanking, []), $archivoUsuarios, $concurso));
 }
@@ -234,7 +247,7 @@ switch ($entrada['accion'] ?? '') {
         $nombreAdmin = mb_strtolower(trim((string) ($entrada['usuario'] ?? '')));
         $clave = (string) ($entrada['clave'] ?? '');
         $autorizado = false;
-        foreach (leerJson($archivoAdmin, []) as $a) {
+        foreach ($administradores as $a) {
             if ($nombreAdmin !== '' && mb_strtolower(trim($a['usuario'] ?? '')) === $nombreAdmin && password_verify($clave, $a['clave'] ?? '')) {
                 $autorizado = true;
             }
